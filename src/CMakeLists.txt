@@ -15,22 +15,24 @@ set(USE_SHARED_MBEDTLS_LIBRARY OFF CACHE BOOL "" FORCE)
 set(USE_STATIC_MBEDTLS_LIBRARY ON CACHE BOOL "" FORCE)
 add_subdirectory(mbedtls)
 
-add_executable(${CMAKE_PROJECT_NAME}
-    aes.c
-    ConvertUTF.c
-    cnmt.c
-    extkeys.c
-    filepath.c
-    hfs0.c
-    main.c
-    nca.c
-    nsp.c
-    pki.c
-    rsa.c
-    romfs.c
-    sha.c
-    utils.c
-    xci.c
+add_executable(${CMAKE_PROJECT_NAME})
+target_sources(${CMAKE_PROJECT_NAME} 
+    PRIVATE
+        aes.c
+        ConvertUTF.c
+        cnmt.c
+        extkeys.c
+        filepath.c
+        hfs0.c
+        main.c
+        nca.c
+        nsp.c
+        pki.c
+        rsa.c
+        romfs.c
+        sha.c
+        utils.c
+        xci.c
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME}
@@ -40,8 +42,13 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 
 if(MSVC)
     target_include_directories(${CMAKE_PROJECT_NAME}
-    PRIVATE
-        msvc_compat
+        PRIVATE
+            msvc_compat/include
+    )
+
+    target_sources(${CMAKE_PROJECT_NAME}
+        PRIVATE
+            msvc_compat/libgen.c
     )
 endif()
 

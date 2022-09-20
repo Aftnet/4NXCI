@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <dirent.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include "types.h"
 #include "filepath.h"
 
@@ -14,9 +14,11 @@
 #include <wchar.h>
 #endif
 
-void os_strcpy(oschar_t *dst, const char *src) {
+void os_strcpy(oschar_t *dst, const char *src)
+{
 #ifdef _WIN32
-    if (src == NULL) return;
+    if (src == NULL)
+        return;
 
     const UTF8 *sourceStart = (const UTF8 *)src;
     UTF16 *targetStart = (UTF16 *)dst;
@@ -26,7 +28,8 @@ void os_strcpy(oschar_t *dst, const char *src) {
     const UTF8 *sourceEnd = (const UTF8 *)(src + src_len);
     UTF16 *targetEnd = (UTF16 *)(dst + dst_len);
 
-    if (ConvertUTF8toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, 0) != conversionOK) {
+    if (ConvertUTF8toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, 0) != conversionOK)
+    {
         fprintf(stderr, "Failed to convert %s to UTF-16!\n", src);
         exit(EXIT_FAILURE);
     }
@@ -35,7 +38,8 @@ void os_strcpy(oschar_t *dst, const char *src) {
 #endif
 }
 
-int os_makedir(const oschar_t *dir) {
+int os_makedir(const oschar_t *dir)
+{
 #ifdef _WIN32
     return _wmkdir(dir);
 #else
@@ -43,7 +47,8 @@ int os_makedir(const oschar_t *dir) {
 #endif
 }
 
-int os_rmdir(const oschar_t *dir) {
+int os_rmdir(const oschar_t *dir)
+{
 #ifdef _WIN32
     return _wrmdir(dir);
 #else
@@ -51,23 +56,27 @@ int os_rmdir(const oschar_t *dir) {
 #endif
 }
 
-void filepath_update(filepath_t *fpath) {
+void filepath_update(filepath_t *fpath)
+{
     memset(fpath->os_path, 0, MAX_PATH * sizeof(oschar_t));
     os_strcpy(fpath->os_path, fpath->char_path);
 }
 
-void filepath_init(filepath_t *fpath) {
+void filepath_init(filepath_t *fpath)
+{
     fpath->valid = VALIDITY_INVALID;
 }
 
-void filepath_copy(filepath_t *fpath, filepath_t *copy) {
+void filepath_copy(filepath_t *fpath, filepath_t *copy)
+{
     if (copy != NULL && copy->valid == VALIDITY_VALID)
         memcpy(fpath, copy, sizeof(filepath_t));
     else
         memset(fpath, 0, sizeof(filepath_t));
 }
 
-void filepath_append(filepath_t *fpath, const char *format, ...) {
+void filepath_append(filepath_t *fpath, const char *format, ...)
+{
     char tmppath[MAX_PATH];
     va_list args;
 
@@ -85,7 +94,8 @@ void filepath_append(filepath_t *fpath, const char *format, ...) {
     filepath_update(fpath);
 }
 
-void filepath_append_n(filepath_t *fpath, uint32_t n, const char *format, ...) {
+void filepath_append_n(filepath_t *fpath, uint32_t n, const char *format, ...)
+{
     char tmppath[MAX_PATH];
     va_list args;
 
@@ -103,18 +113,23 @@ void filepath_append_n(filepath_t *fpath, uint32_t n, const char *format, ...) {
     filepath_update(fpath);
 }
 
-void filepath_set(filepath_t *fpath, const char *path) {
-    if (strlen(path) < MAX_PATH) {
+void filepath_set(filepath_t *fpath, const char *path)
+{
+    if (strlen(path) < MAX_PATH)
+    {
         fpath->valid = VALIDITY_VALID;
         memset(fpath->char_path, 0, MAX_PATH);
         strncpy(fpath->char_path, path, MAX_PATH - 1);
         filepath_update(fpath);
-    } else {
+    }
+    else
+    {
         fpath->valid = VALIDITY_INVALID;
     }
 }
 
-oschar_t *filepath_get(filepath_t *fpath) {
+oschar_t *filepath_get(filepath_t *fpath)
+{
     if (fpath->valid == VALIDITY_INVALID)
         return NULL;
     else
