@@ -4,7 +4,6 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
 
 project("4nxci" C)
 
-add_subdirectory(mbedtls)
 set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)
 set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(ENABLE_ZLIB_SUPPORT OFF CACHE BOOL "" FORCE)
@@ -14,6 +13,7 @@ set(UNSAFE_BUILD OFF CACHE BOOL "" FORCE)
 set(USE_PKCS11_HELPER_LIBRARY OFF CACHE BOOL "" FORCE)
 set(USE_SHARED_MBEDTLS_LIBRARY OFF CACHE BOOL "" FORCE)
 set(USE_STATIC_MBEDTLS_LIBRARY ON CACHE BOOL "" FORCE)
+add_subdirectory(mbedtls)
 
 add_executable(${CMAKE_PROJECT_NAME}
     aes.c
@@ -37,5 +37,12 @@ target_include_directories(${CMAKE_PROJECT_NAME}
     PRIVATE
         mbedtls/include
 )
+
+if(MSVC)
+    target_include_directories(${CMAKE_PROJECT_NAME}
+    PRIVATE
+        msvc_compat
+    )
+endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME} "mbedtls")
