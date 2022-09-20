@@ -17,8 +17,6 @@ jobs:
       run: cmake -S src -B build -G "Unix Makefiles"
     - name: Build
       run: cmake --build build --config Release
-        name: 4nxci-linux-arm64
-        path: build/release/4nxci
     - uses: actions/upload-artifact@v3
       with:
         name: 4nxci-linux-x64
