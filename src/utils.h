@@ -21,10 +21,12 @@ struct filepath;
 #define MAX_PATH 4095
 #endif
 
-#define FATAL_ERROR(msg) do {\
-    fprintf(stderr, "Error: %s\n", msg);\
-    exit(EXIT_FAILURE);\
-} while (0)
+#define FATAL_ERROR(msg)                     \
+    do                                       \
+    {                                        \
+        fprintf(stderr, "Error: %s\n", msg); \
+        exit(EXIT_FAILURE);                  \
+    } while (0)
 
 uint32_t align(uint32_t offset, uint32_t alignment);
 uint64_t align64(uint64_t offset, uint64_t alignment);
@@ -48,21 +50,22 @@ inline int fseeko64(FILE *__stream, long long __off, int __whence)
 {
     return _fseeki64(__stream, __off, __whence);
 }
-inline long long ftello64(FILE * stream)
+inline long long ftello64(FILE *__stream)
 {
     return _ftelli64(__stream);
 }
 #elif __MINGW32__
-    /* MINGW32 does not have 64-bit offsets even with large file support. */
-    extern int fseeko64 (FILE *__stream, _off64_t __off, int __whence);
-    extern _off64_t ftello64(FILE * stream);
+/* MINGW32 does not have 64-bit offsets even with large file support. */
+extern int fseeko64(FILE *__stream, _off64_t __off, int __whence);
+extern _off64_t ftello64(FILE *stream);
 #else
-    /* off_t is 64-bit with large file support */
-    #define fseeko64 fseek
-	#define ftello64 ftell
+/* off_t is 64-bit with large file support */
+#define fseeko64 fseek
+#define ftello64 ftell
 #endif
 
-static inline uint64_t media_to_real(uint64_t media) {
+static inline uint64_t media_to_real(uint64_t media)
+{
     return MEDIA_SIZE * media;
 }
 
