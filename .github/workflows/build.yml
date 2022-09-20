@@ -55,7 +55,7 @@ jobs:
     steps:
     - uses: actions/download-artifact@v3
       with:
-      path: artifacts
+        path: artifacts
     - name: Set exec permission
       run: chmod -R 755 artifacts
     - name: Generate archives
