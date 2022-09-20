@@ -1,0 +1,83 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [ "master" ]
+    types: [ opened, reopened, closed, edited ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure
+      run: cmake -S src -B build -G "Unix Makefiles"
+    - name: Build
+      run: cmake --build build --config Release
+        name: 4nxci-linux-arm64
+        path: build/release/4nxci
+    - uses: actions/upload-artifact@v3
+      with:
+        name: 4nxci-linux-x64
+        path: build/4nxci
+
+  build_macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure
+      run: cmake -S src -B build -G "Xcode"
+    - name: Build
+      run: cmake --build build --config Release
+    - uses: actions/upload-artifact@v3
+      with:
+        name: 4nxci-macos-x64
+        path: build/Release/4nxci
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure
+      run: cmake -S src -B build -G "Visual Studio 17 2022"
+    - name: Build
+      run: cmake --build build --config Release
+    - uses: actions/upload-artifact@v3
+      with:
+        name: 4nxci-windows-x64
+        path: build/Release/4nxci.exe
+
+  release:
+    needs: [ build_linux, build_macos, build_windows ]
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - name: Set exec permission
+        run: chmod -R 755 artifacts
+      - name: Generate archives
+        run: |
+#          zip -j artifacts/4nxci-macos-arm64.zip artifacts/4nxci-macos-arm64/*
+          zip -j artifacts/4nxci-macos-x64.zip artifacts/4nxci-macos-x64/*
+#          zip -j artifacts/4nxci-linux-arm64.zip artifacts/4nxci-linux-arm64/*
+          zip -j artifacts/4nxci-linux-x64.zip artifacts/4nxci-linux-x64/*
+#          zip -j artifacts/4nxci-windows-arm64.zip artifacts/4nxci-windows-arm64/*
+          zip -j artifacts/4nxci-windows-x64.zip artifacts/4nxci-windows-x64/*
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+#            artifacts/4nxci-macos-arm64.zip
+            artifacts/4nxci-macos-x64.zip
+#            artifacts/4nxci-linux-arm64.zip
+            artifacts/4nxci-linux-x64.zip
+#            artifacts/4nxci-windows-arm64.zip
+            artifacts/4nxci-windows-x64.zip
